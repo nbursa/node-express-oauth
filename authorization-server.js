@@ -1,3 +1,5 @@
+import { containsAll } from './utils';
+
 const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -59,7 +61,7 @@ app.get('/authorize', (req, res) => {
   const client = req.query['client_id'];
   const clientScopes = client.scopes.split(' ');
 	const allowed = containsAll(clients[client].scopes, clientScopes)
-  return a.includes(client)
+  return Object.keys(clients).includes(client)
     ? allowed ? res.end(res.status(200)) : res.end(res.status(401))
     : res.end(res.status(401));
 });
