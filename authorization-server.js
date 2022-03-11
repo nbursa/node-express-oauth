@@ -66,15 +66,13 @@ app.get('/authorize', (req, res) => {
 		res.status(401).send('Error: invalid scopes requested!')
 		return
 	}
-  // const clientScopes = req.query.scope.split(' ');
-  // const allowed = containsAll(clients[client].scopes, clientScopes);
   const requestId = randomString();
-  // Object.keys(clients).includes(client)
-  //   ? allowed
-  //     ? res.end(res.status(200))
-  //     : res.end(res.status(401))
-  //   : res.end(res.status(401));
   requests[requestId] = req.query;
+	res.render('login', {
+		client,
+		scope: req.query.scope,
+		requestId,
+	});
 });
 
 const server = app.listen(config.port, 'localhost', function () {
