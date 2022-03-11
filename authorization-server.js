@@ -56,15 +56,24 @@ Your code here
 
 // 1. Client id validation route
 app.get('/authorize', (req, res) => {
-  const client = req.query['client_id'];
-  const clientScopes = req.query.scope.split(' ');
-  const allowed = containsAll(clients[client].scopes, clientScopes);
+	const clientId = req.query.client_id;
+  const client = clients[clientId];
+	if (!client) {
+		res.status(401).send('Error: user not authorized!')
+		return
+	}
+	if (typeof req.query.scope !== 'string' || !containsAll(client.scopes, req.query.scope.split(' '))) {
+		res.status(401).send('Error: invalid scopes requested!')
+		return
+	}
+  // const clientScopes = req.query.scope.split(' ');
+  // const allowed = containsAll(clients[client].scopes, clientScopes);
   const requestId = randomString();
-  Object.keys(clients).includes(client)
-    ? allowed
-      ? res.end(res.status(200))
-      : res.end(res.status(401))
-    : res.end(res.status(401));
+  // Object.keys(clients).includes(client)
+  //   ? allowed
+  //     ? res.end(res.status(200))
+  //     : res.end(res.status(401))
+  //   : res.end(res.status(401));
   requests[requestId] = req.query;
 });
 
