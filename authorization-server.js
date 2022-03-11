@@ -85,6 +85,7 @@ app.post('/approve', (req, res) => {
 		res.status(401).send('Error: Credentials do not match!')
 		return
 	}
+	res.status(200)
 	const clientRequest = requests[rId];
 	delete requests[rId];
 	if (!clientRequest) {
@@ -98,7 +99,7 @@ app.post('/approve', (req, res) => {
 		code,
 		state: clientRequest.state
 	}
-	res.status(200).redirect(url.format(redirectUri))
+	res.redirect(url.format(redirectUri))
 	// return res.status(200);
 })
 
