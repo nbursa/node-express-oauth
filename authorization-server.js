@@ -87,6 +87,7 @@ app.post('/approve', (req, res) => {
 		res.status(401).send('Error: Credentials do not match!')
 		return
 	}
+	res.status(200);
 })
 
 const server = app.listen(config.port, 'localhost', function () {
