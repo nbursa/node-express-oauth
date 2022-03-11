@@ -60,13 +60,13 @@ app.get('/authorize', (req, res) => {
   const client = req.query['client_id'];
   const clientScopes = req.query.scope.split(' ');
   const allowed = containsAll(clients[client].scopes, clientScopes);
-  const randomString = randomString();
+  const requestId = randomString();
   Object.keys(clients).includes(client)
     ? allowed
       ? res.end(res.status(200))
       : res.end(res.status(401))
     : res.end(res.status(401));
-  requests[randomString] = req.query;
+  requests[requestId] = req.query;
 });
 
 const server = app.listen(config.port, 'localhost', function () {
