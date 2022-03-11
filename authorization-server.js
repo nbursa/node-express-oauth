@@ -7,6 +7,7 @@ const {
   containsAll,
   decodeAuthCredentials,
   timeout,
+	randomString,
 } = require('./utils');
 
 const config = {
@@ -59,6 +60,8 @@ app.get('/authorize', (req, res) => {
   const client = req.query['client_id'];
   const clientScopes = req.query.scope.split(' ');
   const allowed = containsAll(clients[client].scopes, clientScopes);
+	const randomString = randomString();
+	requests[randomString] = req.query;
   return Object.keys(clients).includes(client)
     ? allowed
       ? res.end(res.status(200))
