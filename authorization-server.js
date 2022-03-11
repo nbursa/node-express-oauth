@@ -7,7 +7,6 @@ const {
   containsAll,
   decodeAuthCredentials,
   timeout,
-  randomString,
 } = require('./utils');
 
 const config = {
