@@ -56,24 +56,38 @@ Your code here
 
 // 1. Client id validation route
 app.get('/authorize', (req, res) => {
-	const clientId = req.query.client_id;
+  const clientId = req.query.client_id;
   const client = clients[clientId];
-	if (!client) {
-		res.status(401).send('Error: user not authorized!')
-		return
-	}
-	if (typeof req.query.scope !== 'string' || !containsAll(client.scopes, req.query.scope.split(' '))) {
-		res.status(401).send('Error: invalid scopes requested!')
-		return
-	}
+  if (!client) {
+    res.status(401).send('Error: user not authorized!');
+    return;
+  }
+  if (
+    typeof req.query.scope !== 'string' ||
+    !containsAll(client.scopes, req.query.scope.split(' '))
+  ) {
+    res.status(401).send('Error: invalid scopes requested!');
+    return;
+  }
   const requestId = randomString();
   requests[requestId] = req.query;
-	res.render('login', {
-		client,
-		scope: req.query.scope,
-		requestId,
-	});
+  res.render('login', {
+    client,
+    scope: req.query.scope,
+    requestId,
+  });
 });
+
+// 2. Verify username and password
+app.post('/approve', (req, res) => {
+	const user = req.body.userName;
+	const pass = req.body.password;
+	const rId = req.body.requestId;
+	if (!users[user] || users[user].password !== pass) {
+		res.status(401).send('Error: Credentials do not match!')
+		return
+	}
+})
 
 const server = app.listen(config.port, 'localhost', function () {
   var host = server.address().address;
