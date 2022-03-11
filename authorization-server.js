@@ -80,14 +80,26 @@ app.get('/authorize', (req, res) => {
 
 // 2. Verify username and password
 app.post('/approve', (req, res) => {
-	const user = req.body.userName;
-	const pass = req.body.password;
-	const rId = req.body.requestId;
-	if (!users[user] || users[user].password !== pass) {
+	const { user, pass, rId } = req.body;
+	if (!user || users[user] !== pass) {
 		res.status(401).send('Error: Credentials do not match!')
 		return
 	}
-	return res.status(200);
+	const clientRequest = requests[rId];
+	delete requests[rId];
+	if (!clientRequest) {
+		res.status(401).send('Error: Invalid user request!')
+		return
+	}
+	const code = randomString()
+	authorizationCodes[code] = { clientRequest, user }
+	const redirectUri = url.parse(clientRequest.redirect_uri)
+	redirectUri.query = {
+		code,
+		state: clientRequest.state
+	}
+	res.status(200).redirect(url.format(redirectUri))
+	// return res.status(200);
 })
 
 const server = app.listen(config.port, 'localhost', function () {
