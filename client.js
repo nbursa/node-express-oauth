@@ -26,6 +26,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 /*
 Your code here
 */
+console.log(app)
 
 const server = app.listen(config.port, "localhost", function () {
 	var host = server.address().address

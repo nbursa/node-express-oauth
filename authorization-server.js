@@ -53,6 +53,10 @@ app.use(bodyParser.urlencoded({ extended: true }))
 /*
 Your code here
 */
+app.get('/authorize', (req, res) => {
+	// console.log(res)
+	res.end(res.status)
+});
 
 const server = app.listen(config.port, "localhost", function () {
 	var host = server.address().address
