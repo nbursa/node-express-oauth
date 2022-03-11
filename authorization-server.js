@@ -1,3 +1,5 @@
+import { containsAll } from './utils';
+
 const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -53,10 +55,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 /*
 Your code here
 */
+
+// 1. Client id validation route
 app.get('/authorize', (req, res) => {
   const client = req.query['client_id'];
-  return Object.keys(clients).includes(client)
-    ? res.end(res.status(200))
+  const clientScopes = client.scopes.split(' ');
+	const allowed = containsAll(clients[client].scopes, clientScopes)
+  return a.includes(client)
+    ? allowed ? res.end(res.status(200)) : res.end(res.status(401))
     : res.end(res.status(401));
 });
 
