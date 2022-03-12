@@ -54,7 +54,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 Your code here
 */
 
-// 1. Client id validation route
+// 1
 app.get('/authorize', (req, res) => {
   const clientId = req.query.client_id;
   const client = clients[clientId];
@@ -78,28 +78,66 @@ app.get('/authorize', (req, res) => {
   });
 });
 
-// 2. Verify username and password
+// 2
 app.post('/approve', (req, res) => {
-  const { user, pass, rId } = req.body;
-  if (!user || users[user] !== pass) {
+  const { userName, password, requestId } = req.body;
+  if (!userName || users[userName] !== password) {
     res.status(401).send('Error: Credentials do not match!');
     return;
   }
-  // res.status(200)
-  const clientRequest = requests[rId];
-  delete requests[rId];
+  const clientRequest = requests[requestId];
+  delete requests[requestId];
   if (!clientRequest) {
     res.status(401).send('Error: Invalid user request!');
     return;
   }
   const code = randomString();
-  authorizationCodes[code] = { clientRequest, user };
+  authorizationCodes[code] = { clientRequest, userName };
   const redirectUri = url.parse(clientRequest.redirect_uri);
   redirectUri.query = {
     code,
     state: clientRequest.state,
   };
   res.redirect(url.format(redirectUri));
+});
+
+// 3
+app.post('/token', (req, res) => {
+  let authCredentials = req.headers.authorization;
+  if (!authCredentials) {
+    res.status(401).send('Error: Not authorized!');
+    return;
+  }
+  const { clientId, clientSecret } = decodeAuthCredentials(authCredentials);
+  const client = clients[clientId];
+  if (!client || client.clientSecret !== clientSecret) {
+    res.status(401).send('Error: Client not authorized!');
+    return;
+  }
+  const code = req.body.code;
+  if (!code || !authorizationCodes[code]) {
+    res.status(401).status('Error: Invalid code!');
+    return;
+  }
+  const { clientReq, userName } = authorizationCodes[code];
+  delete authorizationCodes[code];
+  const token = jwt.sign(
+    {
+      userName,
+      scope: clientReq.scope,
+    },
+    config.privateKey,
+    {
+      algorithm: 'RS256',
+      expiresIn: 300,
+      issuer: 'http://localhost' + config.port,
+    }
+  );
+  res.json({
+    access_token: token,
+    token_type: 'Bearer',
+    scope: clientReq.scope,
+  });
 });
 
 const server = app.listen(config.port, 'localhost', function () {
