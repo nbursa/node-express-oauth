@@ -32,32 +32,35 @@ app.use(bodyParser.urlencoded({ extended: true }))
 /*
 Your code here
 */
-app.get('/user-info', (req, res) => {
-	const authToken = req.headers.authorization
-	const token = authToken.slice('bearer '.length)
-	// const encoded = jwt.verify(token, config.publicKey, { algorithms: ["RS256"] })
-	if (!authToken) {
-		res.status(401).send('Error: Client unauthorized!')
+app.get("/user-info", (req, res) => {
+	if (!req.headers.authorization) {
+		res.status(401).send("Error: client unauthorized")
 		return
 	}
+
+	const authToken = req.headers.authorization.slice("bearer ".length)
 	let userInfo = null
 	try {
-		userInfo = jwt.verify(token, config.publicKey, { algorithms: ["RS256"] })
-	} catch (err) {
-		res.status(401).send('Error: Client unauthorized!')
+		userInfo = jwt.verify(authToken, config.publicKey, {
+			algorithms: ["RS256"],
+		})
+	} catch (e) {
+		res.status(401).send("Error: client unauthorized")
 		return
 	}
 	if (!userInfo) {
-		res.status(401).send('Error: Client unauthorized!')
+		res.status(401).send("Error: client unauthorized")
 		return
 	}
+
 	const user = users[userInfo.userName]
 	const userWithRestrictedFields = {}
-	const scope = userInfo.scope.split(' ')
+	const scope = userInfo.scope.split(" ")
 	for (let i = 0; i < scope.length; i++) {
-		const field = scope[i].slice('permission:'.length)
+		const field = scope[i].slice("permission:".length)
 		userWithRestrictedFields[field] = user[field]
 	}
+
 	res.json(userWithRestrictedFields)
 })
 
