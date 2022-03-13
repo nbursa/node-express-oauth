@@ -34,16 +34,31 @@ Your code here
 */
 app.get('/user-info', (req, res) => {
 	const authToken = req.headers.authorization
-	const token = authToken.slice(7)
-	const encoded = jwt.verify(token, config.publicKey, { algorithms: ["RS256"] })
+	const token = authToken.slice('bearer '.length)
+	// const encoded = jwt.verify(token, config.publicKey, { algorithms: ["RS256"] })
 	if (!authToken) {
-		res.status(401).send('Error: Authorization missing!')
+		res.status(401).send('Error: Client unauthorized!')
 		return
 	}
-	if (!encoded) {
-		res.status(401).send('Error: Encoding error!')
+	let userInfo = null
+	try {
+		userInfo = jwt.verify(token, config.publicKey, { algorithms: ["RS256"] })
+	} catch (err) {
+		res.status(401).send('Error: Client unauthorized!')
 		return
 	}
+	if (!userInfo) {
+		res.status(401).send('Error: Client unauthorized!')
+		return
+	}
+	const user = users[userInfo.userName]
+	const userWithRestrictedFields = {}
+	const scope = userInfo.scope.split(' ')
+	for (let i = 0; i < scope.length; i++) {
+		const field = scope[i].slice('permission:'.length)
+		userWithRestrictedFields[field] = user[field]
+	}
+	res.json(userWithRestrictedFields)
 })
 
 const server = app.listen(config.port, "localhost", function () {
