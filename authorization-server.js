@@ -98,7 +98,7 @@ app.post('/approve', (req, res) => {
     code,
     state: clientRequest.state,
   };
-  res.status(200).redirect(url.format(redirectUri));
+  res.sendStatus(200).redirect(url.format(redirectUri));
 });
 
 // 3
@@ -116,7 +116,7 @@ app.post('/token', (req, res) => {
   }
   const code = req.body.code;
   if (!code || !authorizationCodes[code]) {
-    res.status(401).status('Error: Invalid code!');
+    res.status(401).send('Error: Invalid code!');
     return;
   }
   const { clientReq, userName } = authorizationCodes[code];
