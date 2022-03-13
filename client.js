@@ -10,9 +10,9 @@ const config = {
 	clientSecret: "zETqHgl0d7ThysUqPnaFuLOmG1E=",
 	redirectUri: "http://localhost:9000/callback",
 
-	authorizationEndpoint: "http://localhost:9001/authorize",
-	tokenEndpoint: "http://localhost:9001/token",
-	userInfoEndpoint: "http://localhost:9002/user-info",
+	authorizationEndpoint: "http://localhost:9000/authorize",
+	tokenEndpoint: "http://localhost:9000/token",
+	userInfoEndpoint: "http://localhost:9000/user-info",
 }
 let state = ""
 
