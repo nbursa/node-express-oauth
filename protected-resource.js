@@ -32,7 +32,10 @@ app.use(bodyParser.urlencoded({ extended: true }))
 Your code here
 */
 app.get('/user-info', (req, res) => {
-	
+	const authToken = req.headers.authorization
+	if (!authToken) {
+		res.status(401).send('Error: Authorization missing!')
+	}
 })
 
 const server = app.listen(config.port, "localhost", function () {
