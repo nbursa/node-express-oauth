@@ -2,6 +2,7 @@ const express = require("express")
 const bodyParser = require("body-parser")
 const fs = require("fs")
 const { timeout } = require("./utils")
+const jwt = require("jsonwebtoken")
 
 const config = {
 	port: 9002,
@@ -33,8 +34,15 @@ Your code here
 */
 app.get('/user-info', (req, res) => {
 	const authToken = req.headers.authorization
+	const token = authToken.slice(7)
+	const encoded = jwt.verify(token, config.publicKey, { algorithms: ["RS256"] })
 	if (!authToken) {
 		res.status(401).send('Error: Authorization missing!')
+		return
+	}
+	if (!encoded) {
+		res.status(401).send('Error: Encoding error!')
+		return
 	}
 })
 
